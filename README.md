@@ -36,6 +36,8 @@ Add the following configuration to your MCP-compatible application:
 
 This remote MCP server is already deployed and ready to use!
 
+![Image](https://github.com/user-attachments/assets/34b5228e-2bb8-4fb4-9326-248a62f9519a)
+
 ### Option 2: With FastMCP Development Tools
 
 ```bash
@@ -53,6 +55,8 @@ This MCP server works with Claude Desktop, Cursor, Windsurf, and other MCP-compa
 - **Claude Desktop**:
   - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
   - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+
+![Image](https://github.com/user-attachments/assets/c855b19a-9498-47c5-88cd-a778d04319a0)
   
 - **Cursor**:
   - macOS: `~/Library/Application Support/Cursor/cursor_desktop_config.json`
