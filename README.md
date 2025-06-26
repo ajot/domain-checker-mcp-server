@@ -87,6 +87,54 @@ Add the following configuration to the appropriate file, making sure to point to
 
 **Important**: Replace paths with the actual paths to your virtual environment and domain checker directory.
 
+## Deploy to DigitalOcean App Platform
+
+This MCP server can be deployed as a remote MCP server on DigitalOcean App Platform.
+
+### Prerequisites
+
+- A DigitalOcean account
+- The [doctl](https://docs.digitalocean.com/reference/doctl/how-to/install/) command-line tool (optional)
+- Git repository with your code
+
+### Deployment Steps
+
+1. **Push your code to a Git repository**
+   Make sure all your changes are committed and pushed to a GitHub, GitLab, or Bitbucket repository.
+
+2. **Create a new App on DigitalOcean App Platform**
+   - Go to the [DigitalOcean App Platform](https://cloud.digitalocean.com/apps) dashboard
+   - Click "Create App" and select your Git repository
+   - Select the branch you want to deploy
+   - Choose "Python" as the environment
+
+3. **Configure the App**
+   - Make sure the HTTP port is set to 8080
+   - Set the run command to: `gunicorn --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 "domain-checker:mcp.app"`
+   - Set the environment variable: `PORT=8080`
+
+4. **Deploy the App**
+   - Click "Deploy to Production"
+   - Wait for the build and deployment to complete
+
+5. **Configure as Remote MCP**
+   Once deployed, you can use the app URL as a remote MCP server in your MCP-compatible applications:
+
+   ```json
+   {
+     "mcpServers": {
+       "domain-checker": {
+         "url": "https://your-app-name.ondigitalocean.app/mcp",
+         "description": "Check domain name availability"
+       }
+     }
+   }
+   ```
+
+### Updating Your Deployment
+
+To update your deployed app, simply push changes to your Git repository. DigitalOcean App Platform will automatically build and deploy the new version.
+
 ## Usage Examples
 
 ### Check Single Domain
@@ -136,6 +184,11 @@ Details:
 **2. Timeout Issues**
 - Some WHOIS servers have rate limits
 - Network connectivity issues can cause timeouts
+
+**3. DigitalOcean Deployment Issues**
+- Check that the port is set to 8080 in both the code and the App Platform configuration
+- Verify that all dependencies are in requirements.txt
+- Check the deployment logs for any error messages
 
 ---
 

@@ -1,0 +1,18 @@
+name: domain-checker-mcp
+region: nyc
+services:
+  - name: domain-checker-mcp-server
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: ajot/domain-checker-mcp-server
+    build_command: pip install -r requirements.txt
+    run_command: gunicorn --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 "domain-checker:mcp.app"
+    envs:
+      - key: PORT
+        value: "8080"
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    routes:
+      - path: / 

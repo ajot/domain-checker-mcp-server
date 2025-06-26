@@ -6,6 +6,7 @@ MCP Server for checking domain name availability using FastMCP 2.0
 import asyncio
 import json
 import logging
+import os
 from typing import Any, Dict, List
 import whois
 import dns.resolver
@@ -16,7 +17,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("domain-checker")
 
 # Create the FastMCP server
-mcp = FastMCP("Domain Checker")
+mcp = FastMCP(
+    name="Domain Checker",
+    instructions="When you are asked about domain availability or to check if a domain is available for registration, call the appropriate function."
+)
 
 class DomainChecker:
     """Domain availability checker with multiple verification methods"""
@@ -208,4 +212,5 @@ async def domain_info_resource(domain: str) -> str:
     return json.dumps(result, indent=2)
 
 if __name__ == "__main__":
-    mcp.run()
+    port = int(os.environ.get("PORT", 8080))
+    mcp.run(transport="streamable-http", host="0.0.0.0", port=port, log_level="info")
