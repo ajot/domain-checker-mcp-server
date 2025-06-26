@@ -28,122 +28,187 @@ class DomainChecker:
     def __init__(self):
         self.dns_resolver = dns.resolver.Resolver()
         self.dns_resolver.timeout = 5
-        self.dns_resolver.lifetime = 5
+        self.dns_resolver.lifetime = 10
     
-    async def check_dns_records(self, domain: str) -> bool:
-        """Check if domain has DNS records (indicates it's registered and in use)"""
+    async def check_domain_availability(self, domain: str) -> Dict[str, Any]:
+        """Check if a domain is available using multiple methods"""
+        results = {
+            "domain": domain,
+            "available": None,
+            "whois_available": None,
+            "dns_resolvable": None,
+            "error": None,
+            "details": {}
+        }
+        
         try:
-            # Try common record types
-            for record_type in ['A', 'MX', 'NS', 'SOA']:
-                try:
-                    await asyncio.to_thread(
-                        lambda: self.dns_resolver.resolve(domain, record_type)
-                    )
-                    logger.info(f"Found {record_type} record for {domain}")
-                    return True
-                except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.NoNameservers):
-                    continue
-                except Exception as e:
-                    logger.warning(f"Error checking {record_type} records for {domain}: {e}")
+            # Method 1: WHOIS lookup
+            whois_result = await self._check_whois(domain)
+            results["whois_available"] = whois_result["available"]
+            results["details"]["whois"] = whois_result
             
-            # If we get here, no records were found
-            return False
-        except Exception as e:
-            logger.error(f"Error in DNS check for {domain}: {e}")
-            return False
-    
-    async def check_whois(self, domain: str) -> Dict[str, Any]:
-        """Check domain availability via WHOIS lookup"""
-        try:
-            # Run WHOIS query in a thread to avoid blocking
-            whois_data = await asyncio.to_thread(whois.whois, domain)
+            # Method 2: DNS resolution check
+            dns_result = await self._check_dns_resolution(domain)
+            results["dns_resolvable"] = dns_result["resolvable"]
+            results["details"]["dns"] = dns_result
             
-            # Process the results
-            if whois_data.status is None and whois_data.registrar is None:
-                logger.info(f"Domain {domain} appears to be available (no registrar/status)")
-                return {"available": True, "whois_data": whois_data}
+            # Determine overall availability
+            if results["whois_available"] is True and results["dns_resolvable"] is False:
+                results["available"] = True
+            elif results["whois_available"] is False:
+                results["available"] = False
             else:
-                logger.info(f"Domain {domain} is registered with {whois_data.registrar}")
-                return {"available": False, "whois_data": whois_data}
+                results["available"] = None
+                
         except Exception as e:
-            logger.error(f"WHOIS error for {domain}: {e}")
-            return {"available": False, "error": str(e)}
+            results["error"] = str(e)
+            logger.error(f"Error checking domain {domain}: {e}")
+        
+        return results
+    
+    async def _check_whois(self, domain: str) -> Dict[str, Any]:
+        """Check domain availability using WHOIS"""
+        try:
+            loop = asyncio.get_event_loop()
+            whois_data = await loop.run_in_executor(None, whois.whois, domain)
+            
+            if whois_data is None:
+                return {"available": True, "reason": "No WHOIS data found"}
+            
+            if hasattr(whois_data, 'status') and whois_data.status:
+                return {
+                    "available": False, 
+                    "reason": "Domain has active status",
+                    "status": whois_data.status,
+                    "registrar": getattr(whois_data, 'registrar', None),
+                    "creation_date": str(getattr(whois_data, 'creation_date', None))
+                }
+            
+            if hasattr(whois_data, 'registrar') and whois_data.registrar:
+                return {
+                    "available": False,
+                    "reason": "Domain has registrar",
+                    "registrar": whois_data.registrar
+                }
+            
+            return {
+                "available": None,
+                "reason": "WHOIS data exists but unclear status",
+                "raw_data": str(whois_data)[:500]
+            }
+            
+        except whois.parser.PywhoisError as e:
+            return {"available": True, "reason": f"WHOIS parser error: {str(e)}"}
+        except Exception as e:
+            return {"available": None, "reason": f"WHOIS lookup failed: {str(e)}"}
+    
+    async def _check_dns_resolution(self, domain: str) -> Dict[str, Any]:
+        """Check if domain resolves via DNS"""
+        try:
+            loop = asyncio.get_event_loop()
+            
+            def resolve_dns():
+                try:
+                    answers = self.dns_resolver.resolve(domain, 'A')
+                    return [str(answer) for answer in answers]
+                except dns.resolver.NXDOMAIN:
+                    return None
+                except Exception as e:
+                    raise e
+            
+            a_records = await loop.run_in_executor(None, resolve_dns)
+            
+            if a_records:
+                return {
+                    "resolvable": True,
+                    "a_records": a_records,
+                    "reason": "Domain resolves to IP addresses"
+                }
+            else:
+                return {
+                    "resolvable": False,
+                    "reason": "Domain does not resolve (NXDOMAIN)"
+                }
+                
+        except Exception as e:
+            return {
+                "resolvable": None,
+                "reason": f"DNS lookup failed: {str(e)}"
+            }
 
-
+# Initialize domain checker
 domain_checker = DomainChecker()
 
 @mcp.tool()
-async def check_domain_availability(domain: str) -> Dict[str, Any]:
-    """
-    Check if a domain name is available for registration.
+async def check_domain(domain: str) -> str:
+    """Check if a single domain name is available for registration"""
+    result = await domain_checker.check_domain_availability(domain)
     
-    Args:
-        domain: The domain name to check (e.g., "example.com")
-        
-    Returns:
-        A dictionary with availability information and details
-    """
-    result = {
-        "domain": domain,
-        "available": False,
-        "dns_records_exist": False,
-        "whois_result": None,
-        "confidence": "low"
-    }
-    
-    # First check WHOIS
-    whois_result = await domain_checker.check_whois(domain)
-    result["whois_result"] = whois_result
-    
-    if "error" in whois_result:
-        # WHOIS lookup failed, rely only on DNS
-        result["confidence"] = "very low"
+    # Format the response nicely
+    if result["available"] is True:
+        status = "✅ LIKELY AVAILABLE"
+    elif result["available"] is False:
+        status = "❌ NOT AVAILABLE"
     else:
-        result["available"] = whois_result.get("available", False)
-        result["confidence"] = "medium"
+        status = "❓ UNCLEAR"
     
-    # Then check DNS records
-    has_dns = await domain_checker.check_dns_records(domain)
-    result["dns_records_exist"] = has_dns
+    response = f"""Domain: {domain}
+Status: {status}
+
+WHOIS Check: {'Available' if result['whois_available'] else 'Registered' if result['whois_available'] is False else 'Unclear'}
+DNS Resolution: {'Not resolving' if result['dns_resolvable'] is False else 'Resolving' if result['dns_resolvable'] else 'Error'}
+
+Details:
+{json.dumps(result['details'], indent=2)}
+"""
     
-    # If DNS records exist, domain is definitely not available
-    if has_dns:
-        result["available"] = False
-        result["confidence"] = "high"
+    if result["error"]:
+        response += f"\nError: {result['error']}"
     
-    # If WHOIS says available and no DNS records, high confidence in availability
-    if result["available"] and not has_dns:
-        result["confidence"] = "high"
-    
-    return result
+    return response
 
 @mcp.tool()
-async def batch_check_domains(domains: List[str]) -> Dict[str, Any]:
-    """
-    Check multiple domains for availability in a single request.
+async def check_multiple_domains(domains: List[str]) -> str:
+    """Check availability for multiple domain names at once"""
+    if not domains:
+        return "Error: Domain list is required"
     
-    Args:
-        domains: List of domain names to check
+    # Check domains concurrently
+    tasks = [domain_checker.check_domain_availability(domain) for domain in domains]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    # Handle any exceptions in the results
+    processed_results = []
+    for i, result in enumerate(results):
+        if isinstance(result, Exception):
+            processed_results.append({
+                "domain": domains[i],
+                "available": None,
+                "error": str(result)
+            })
+        else:
+            processed_results.append(result)
+    
+    # Format results as a table
+    response = "Domain Availability Check Results:\n\n"
+    for result in processed_results:
+        if result["available"] is True:
+            status = "✅ LIKELY AVAILABLE"
+        elif result["available"] is False:
+            status = "❌ NOT AVAILABLE"
+        else:
+            status = "❓ UNCLEAR"
         
-    Returns:
-        Dictionary with results for each domain
-    """
-    results = {}
+        response += f"{result['domain']:<30} {status}\n"
     
-    # Process domains concurrently
-    tasks = [check_domain_availability(domain) for domain in domains]
-    domain_results = await asyncio.gather(*tasks)
+    response += f"\nDetailed results:\n{json.dumps(processed_results, indent=2)}"
     
-    # Organize results by domain
-    for i, domain in enumerate(domains):
-        results[domain] = domain_results[i]
-    
-    return results
+    return response
 
 @mcp.resource("domain://check/{domain}")
 async def domain_info_resource(domain: str) -> str:
     """Get domain availability information as a resource"""
-    result = await check_domain_availability(domain)
+    result = await domain_checker.check_domain_availability(domain)
     return json.dumps(result, indent=2)
 
 if __name__ == "__main__":
