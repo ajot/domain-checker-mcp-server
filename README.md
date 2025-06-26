@@ -46,19 +46,15 @@ A Model Context Protocol (MCP) server that checks domain name availability using
 # Make sure your virtual environment is activated
 fastmcp dev domain-checker.py
 ```
+![Image](https://github.com/user-attachments/assets/beb32cf0-499f-40d3-aeda-a255291ca5f3)
 
 ### Configure in Claude Desktop
-
-**Option 1: Use FastMCP installer**
-```bash
-fastmcp install domain-checker.py --name "Domain Checker"
-```
-
-**Option 2: Manual configuration**
 
 Edit your Claude Desktop config file:
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+Add the following configuration, making sure to point to your virtual environment:
 
 ```json
 {
