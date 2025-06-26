@@ -38,7 +38,7 @@ This remote MCP server is already deployed and ready to use!
 
 ```bash
 # Make sure your virtual environment is activated
-fastmcp dev domain-checker.py
+fastmcp dev local-domain-checker.py
 ```
 ![Image](https://github.com/user-attachments/assets/beb32cf0-499f-40d3-aeda-a255291ca5f3)
 
@@ -67,14 +67,16 @@ Add the following configuration to the appropriate file, making sure to point to
   "mcpServers": {
     "domain-checker": {
       "command": "/path/to/your/venv/bin/python",
-      "args": ["/path/to/your/domain-checker.py"],
-      "cwd": "/path/to/your/domain-checker-mcp-server"
+      "args": ["/path/to/your/local-domain-checker.py"]
     }
   }
 }
 ```
 
-**Important**: Replace paths with the actual paths to your virtual environment and domain checker directory.
+**Important**: 
+- Replace paths with the actual paths to your virtual environment and domain checker directory
+- Use `local-domain-checker.py` for local development (it has simpler configuration without port/host settings)
+- `domain-checker.py` is configured for remote deployment with additional parameters
 
 ## Installation (For Local Use)
 
