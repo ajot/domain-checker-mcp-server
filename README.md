@@ -2,7 +2,7 @@
 
 A Model Context Protocol (MCP) server that checks domain name availability using WHOIS lookups and DNS resolution. Built with the modern FastMCP framework for easy setup and reliable domain availability checking.
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=domain-checker&config=eyJjb21tYW5kIjoicHl0aG9uIC9wYXRoL3RvL3lvdXIvZG9tYWluX2NoZWNrZXIucHkifQ%3D%3D)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=domain-checker-remote-mcp&config=eyJ1cmwiOiJodHRwczovL2RvbWFpbi1jaGVja2VyLXJlbW90ZS1tY3AtbGE1aDUub25kaWdpdGFsb2NlYW4uYXBwL21jcCIsImRlc2NyaXB0aW9uIjoiQ2hlY2sgaWYgYSBkb21haW4gaXMgYXZhaWxhYmxlIiwiY29tbWFuZCI6IiJ9)
 
 
 ![Image](https://github.com/user-attachments/assets/d5e7db9e-346d-436b-9c2f-53f014debe17)
@@ -17,6 +17,8 @@ A Model Context Protocol (MCP) server that checks domain name availability using
 ## Using the Domain Checker
 
 ### Option 1: Use the Remote MCP Server (Easiest)
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=domain-checker-remote-mcp&config=eyJ1cmwiOiJodHRwczovL2RvbWFpbi1jaGVja2VyLXJlbW90ZS1tY3AtbGE1aDUub25kaWdpdGFsb2NlYW4uYXBwL21jcCIsImRlc2NyaXB0aW9uIjoiQ2hlY2sgaWYgYSBkb21haW4gaXMgYXZhaWxhYmxlIiwiY29tbWFuZCI6IiJ9)
 
 Add the following configuration to your MCP-compatible application:
 
@@ -55,6 +57,9 @@ This MCP server works with Claude Desktop, Cursor, Windsurf, and other MCP-compa
 - **Cursor**:
   - macOS: `~/Library/Application Support/Cursor/cursor_desktop_config.json`
   - Windows: `%APPDATA%\Cursor\cursor_desktop_config.json`
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=domain-checker&config=eyJjb21tYW5kIjoicHl0aG9uIC9wYXRoL3RvL3lvdXIvZG9tYWluX2NoZWNrZXIucHkifQ%3D%3D)
+
 
 - **Windsurf**:
   - macOS: `~/Library/Application Support/Windsurf/windsurf_desktop_config.json`
