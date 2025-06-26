@@ -211,6 +211,9 @@ async def domain_info_resource(domain: str) -> str:
     result = await domain_checker.check_domain_availability(domain)
     return json.dumps(result, indent=2)
 
+# Export the FastMCP app for gunicorn
+app = mcp.app
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     mcp.run(transport="streamable-http", host="0.0.0.0", port=port, log_level="info")
