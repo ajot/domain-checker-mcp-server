@@ -14,38 +14,27 @@ A Model Context Protocol (MCP) server that checks domain name availability using
 - 📊 **Batch Processing**: Check multiple domains concurrently
 - 🔍 **Detailed Analysis**: Provides comprehensive availability information
 
-## Installation
-
-### Prerequisites
-
-- Python 3.8 or higher
-- pip package manager
-
-### Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/ajot/domain-checker-mcp-server.git
-   cd domain-checker-mcp-server
-   ```
-
-2. **Create and activate a virtual environment (recommended)**
-   ```bash
-   python -m venv venv
-   # On macOS/Linux
-   source venv/bin/activate
-   # On Windows
-   venv\Scripts\activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
 ## Using the Domain Checker
 
-### With FastMCP Development Tools
+### Option 1: Use the Remote MCP Server (Easiest)
+
+Add the following configuration to your MCP-compatible application:
+
+```json
+{
+  "mcpServers": {
+    "domain-checker-remote-mcp": {
+      "url": "https://domain-checker-remote-mcp-la5h5.ondigitalocean.app/mcp",
+      "description": "Check if a domain is available",
+      "command": ""
+    }
+  }
+}
+```
+
+This remote MCP server is already deployed and ready to use!
+
+### Option 2: With FastMCP Development Tools
 
 ```bash
 # Make sure your virtual environment is activated
@@ -53,7 +42,7 @@ fastmcp dev domain-checker.py
 ```
 ![Image](https://github.com/user-attachments/assets/beb32cf0-499f-40d3-aeda-a255291ca5f3)
 
-### Configure in MCP-Compatible Applications
+### Option 3: Configure Local MCP Server
 
 This MCP server works with Claude Desktop, Cursor, Windsurf, and other MCP-compatible applications.
 
@@ -87,6 +76,35 @@ Add the following configuration to the appropriate file, making sure to point to
 
 **Important**: Replace paths with the actual paths to your virtual environment and domain checker directory.
 
+## Installation (For Local Use)
+
+### Prerequisites
+
+- Python 3.8 or higher
+- pip package manager
+
+### Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/ajot/domain-checker-mcp-server.git
+   cd domain-checker-mcp-server
+   ```
+
+2. **Create and activate a virtual environment (recommended)**
+   ```bash
+   python -m venv venv
+   # On macOS/Linux
+   source venv/bin/activate
+   # On Windows
+   venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
 ## Deploy to DigitalOcean App Platform
 
 This MCP server can be deployed as a remote MCP server on DigitalOcean App Platform.
@@ -109,9 +127,10 @@ This MCP server can be deployed as a remote MCP server on DigitalOcean App Platf
    - Choose "Python" as the environment
 
 3. **Configure the App**
-   - Make sure the HTTP port is set to 8080
-   - Set the run command to: `gunicorn --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 "domain-checker:mcp.app"`
+   - Set the source directory to `/`
+   - Set the run command to: `python domain-checker.py`
    - Set the environment variable: `PORT=8080`
+   - Set HTTP port to 8080
 
 4. **Deploy the App**
    - Click "Deploy to Production"
