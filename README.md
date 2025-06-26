@@ -48,13 +48,25 @@ fastmcp dev domain-checker.py
 ```
 ![Image](https://github.com/user-attachments/assets/beb32cf0-499f-40d3-aeda-a255291ca5f3)
 
-### Configure in Claude Desktop
+### Configure in MCP-Compatible Applications
 
-Edit your Claude Desktop config file:
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+This MCP server works with Claude Desktop, Cursor, Windsurf, and other MCP-compatible applications.
 
-Add the following configuration, making sure to point to your virtual environment:
+#### Configuration Locations
+
+- **Claude Desktop**:
+  - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+  - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+  
+- **Cursor**:
+  - macOS: `~/Library/Application Support/Cursor/cursor_desktop_config.json`
+  - Windows: `%APPDATA%\Cursor\cursor_desktop_config.json`
+
+- **Windsurf**:
+  - macOS: `~/Library/Application Support/Windsurf/windsurf_desktop_config.json`
+  - Windows: `%APPDATA%\Windsurf\windsurf_desktop_config.json`
+
+Add the following configuration to the appropriate file, making sure to point to your virtual environment:
 
 ```json
 {
