@@ -1,0 +1,22 @@
+spec:
+  name: domain-checker-mcp-server
+  region: nyc
+  services:
+    - name: domain-checker-mcp-server
+      environment_slug: python
+      git:
+        branch: main
+        repo_clone_url: https://github.com/ajot/domain-checker-mcp-server/
+      build_command: pip install -r requirements.txt
+      run_command: python domain-checker.py
+      http_port: 8080
+      health_check:
+        http_path: /
+      instance_count: 1
+      instance_size_slug: apps-s-1vcpu-0.5gb
+      routes:
+        - path: /
+      envs:
+        - key: FLASK_ENV
+          value: production
+          scope: RUN_TIME
