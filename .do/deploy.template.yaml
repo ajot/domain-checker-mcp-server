@@ -16,6 +16,3 @@ spec:
       instance_size_slug: apps-s-1vcpu-0.5gb
       routes:
         - path: /
-      envs:
-        - key: PORT
-          value: "8080"
