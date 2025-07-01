@@ -7,12 +7,12 @@ services:
       deploy_on_push: true
       repo: ajot/domain-checker-mcp-server
     build_command: pip install -r requirements.txt
-    run_command: gunicorn --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 "domain-checker:mcp.app"
+    run_command: python domain-checker.py
     envs:
       - key: PORT
         value: "8080"
     http_port: 8080
     instance_count: 1
-    instance_size_slug: basic-xxs
+    instance_size_slug: apps-s-1vcpu-0.5gb
     routes:
       - path: / 

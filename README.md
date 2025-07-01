@@ -1,4 +1,4 @@
-# Domain Checker MCP Server
+# Domain Checker Remote MCP Server
 
 A Model Context Protocol (MCP) server that checks domain name availability using WHOIS lookups and DNS resolution. Built with the modern FastMCP framework for easy setup and reliable domain availability checking.
 
