@@ -7,6 +7,9 @@ A Model Context Protocol (MCP) server that checks domain name availability using
 
 ![Image](https://github.com/user-attachments/assets/d5e7db9e-346d-436b-9c2f-53f014debe17)
 
+## Deploy this Remote MCP Server to DigitalOcean
+[![Deploy to DO](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/ajot/domain-checker-mcp-server/tree/main)
+
 ## Features
 
 - ✅ **Dual Verification**: Uses both WHOIS and DNS resolution for accurate results
