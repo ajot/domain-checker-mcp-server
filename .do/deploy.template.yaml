@@ -11,6 +11,6 @@ spec:
       run_command: python domain-checker.py
       http_port: 8080
       instance_count: 1
-      instance_size_slug: apps-d-1vcpu-2gb
+      instance_size_slug: apps-s-1vcpu-0.5gb
       routes:
         - path: /
